@@ -49,7 +49,7 @@ def extract_bills(text):
     bills.extend(p3.findall(text))
 
     # extracting pattern like XXXX ACT (ex: SUBS act)
-    bills.extend(re.findall(r'\b\w{4}\b\s[Aa][Cc][Tt]', text))
+    bills.extend(re.findall(r'\b[A-Z]+\b\s[Aa][Cc][Tt]', text))
 
     # using yml file to extract other patterns
     for pattern in patterns['patterns']:
