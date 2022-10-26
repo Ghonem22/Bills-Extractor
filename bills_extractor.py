@@ -1,10 +1,16 @@
 import re
 import yaml
+import numpy as np
+import pandas as pd
 
 with open(r'patterns.yml') as file:
     # The FullLoader parameter handles the conversion from YAML
     # scalar values to Python the dictionary format
     patterns = yaml.load(file, Loader=yaml.FullLoader)
+
+
+def read_csv(file):
+    return pd.read_csv(file, sep = ',', header = 0, encoding= 'unicode_escape')
 
 
 def get_pattern(pattern_txt):
@@ -26,6 +32,9 @@ def get_pattern(pattern_txt):
     return pattern
 
 def extract_bills(text):
+    if not text or text in ['nan', '', np.nan]:
+        return text
+
     bills = []
     # extracting pattern like H.R. (H.R. 2062)
     p1 = re.compile("[Hh].?[Rr].?\s?\d+")
@@ -55,5 +64,17 @@ def extract_bills(text):
                     bills.remove(joined_gropus)
 
         bills.extend(results)
-    return bills
 
+    if not bills:
+        return ''
+    else:
+        return ", ".join(bills)
+
+
+if __name__ == '__main__':
+    # apply extract_bills function to csv file
+    csv_file_path = ''
+    csv_saving_path = ''
+    df = read_csv(csv_file_path)
+    df['bills'] = df.apply(lambda x: extract_bills(x['description']), axis=1)
+    df.to_csv(csv_saving_path)
